@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyss Guardians - RuneScape Clan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes starfield {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-100vh); }
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: starfield linear infinite;
+        }
+        .star:nth-child(1) { left: 10%; width: 1px; height: 1px; animation-duration: 3s; animation-delay: 0s; }
+        .star:nth-child(2) { left: 20%; width: 2px; height: 2px; animation-duration: 4s; animation-delay: 1s; }
+        .star:nth-child(3) { left: 30%; width: 1px; height: 1px; animation-duration: 5s; animation-delay: 0.5s; }
+        .star:nth-child(4) { left: 40%; width: 1px; height: 1px; animation-duration: 3.5s; animation-delay: 2s; }
+        .star:nth-child(5) { left: 50%; width: 2px; height: 2px; animation-duration: 4.5s; animation-delay: 1.5s; }
+        .star:nth-child(6) { left: 60%; width: 1px; height: 1px; animation-duration: 3s; animation-delay: 0.8s; }
+        .star:nth-child(7) { left: 70%; width: 1px; height: 1px; animation-duration: 5.5s; animation-delay: 2.5s; }
+        .star:nth-child(8) { left: 80%; width: 2px; height: 2px; animation-duration: 4s; animation-delay: 0.2s; }
+        .star:nth-child(9) { left: 90%; width: 1px; height: 1px; animation-duration: 3.8s; animation-delay: 1.8s; }
+        .star:nth-child(10) { left: 95%; width: 1px; height: 1px; animation-duration: 4.2s; animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-cyan-400">Abyss Guardians</h1>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#mission" class="text-gray-300 hover:text-cyan-400 transition-colors">Mission</a>
+                    <a href="#donate" class="text-gray-300 hover:text-cyan-400 transition-colors">Donate</a>
+                    <a href="#schedule" class="text-gray-300 hover:text-cyan-400 transition-colors">Schedule</a>
+                </div>
+                <div id="utc-clock" class="text-sm text-gray-400 font-mono" aria-live="polite"></div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-black py-20 overflow-hidden">
+        <!-- Animated Starfield -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+                Protect the Runecrafters.<br>Hunt the PKers.
+            </h2>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
+                Organized Abyss patrols • Fair shifts • Worlds 3 & 84 • UTC-based schedule
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:scale-105 focus:ring-4 focus:ring-purple-300" aria-label="Join our Discord server">
+                    Join Discord
+                </a>
+                <a href="#schedule" class="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:scale-105 focus:ring-4 focus:ring-cyan-300" aria-label="View patrol schedule">
+                    View Schedule
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h3 class="text-4xl font-bold text-center mb-12 text-cyan-400">Our Mission</h3>
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    Deep within the Abyss, where runecrafters risk their lives for precious essence, chaos reigns. 
+                    PKers lurk in the shadows, preying on innocent crafters. We are the Abyss Guardians – elite warriors 
+                    who turn the hunter into the hunted. Our mission: patrol the Abyss, eliminate PKer threats, and 
+                    ensure safe passage for all runecrafters. When PKers come for the crafters, they'll find us waiting.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 rounded-2xl p-8 hover:scale-105 transition-transform shadow-lg">
+                    <div class="text-cyan-400 text-4xl mb-4">🛡️</div>
+                    <h4 class="text-xl font-semibold mb-4 text-white">Organized Patrols</h4>
+                    <p class="text-gray-300">Coordinated sweeps through Abyss zones with strategic positioning and real-time communication.</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-2xl p-8 hover:scale-105 transition-transform shadow-lg">
+                    <div class="text-purple-400 text-4xl mb-4">⚡</div>
+                    <h4 class="text-xl font-semibold mb-4 text-white">Rapid Callouts</h4>
+                    <p class="text-gray-300">Instant response system for PKer sightings with quick deployment of Guardian squads.</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-2xl p-8 hover:scale-105 transition-transform shadow-lg">
+                    <div class="text-cyan-400 text-4xl mb-4">⚖️</div>
+                    <h4 class="text-xl font-semibold mb-4 text-white">Fair Rotations</h4>
+                    <p class="text-gray-300">Automated shift scheduling ensuring equal participation and coverage across all time zones.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donations Section -->
+    <section id="donate" class="py-20 bg-black">
+        <div class="container mx-auto px-4">
+            <h3 class="text-4xl font-bold text-center mb-12 text-purple-400">Support the Guardians</h3>
+            
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Real Money Support -->
+                <div class="bg-gray-900 rounded-2xl p-8">
+                    <h4 class="text-2xl font-semibold mb-6 text-cyan-400">Real Money Support</h4>
+                    <p class="text-gray-300 mb-6">Donations help pay clan and site costs. We do not exchange real money for GP.</p>
+                    
+                    <div class="space-y-4">
+                        <a href="#" id="paypal-btn" class="block w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl text-center font-semibold transition-all hover:scale-105 focus:ring-4 focus:ring-blue-300" aria-label="Donate via PayPal">
+                            💳 Donate via PayPal
+                        </a>
+                        <a href="#" id="bmac-btn" class="block w-full bg-yellow-600 hover:bg-yellow-700 text-white py-4 px-6 rounded-xl text-center font-semibold transition-all hover:scale-105 focus:ring-4 focus:ring-yellow-300" aria-label="Buy me a coffee">
+                            ☕ Buy Me a Coffee
+                        </a>
+                    </div>
+                </div>
+
+                <!-- GP Donations -->
+                <div class="bg-gray-900 rounded-2xl p-8">
+                    <h4 class="text-2xl font-semibold mb-6 text-purple-400">GP Donations (In-Game)</h4>
+                    
+                    <form id="gp-pledge-form" class="space-y-4 mb-6">
+                        <div>
+                            <label for="donor-rsn" class="block text-sm font-medium text-gray-300 mb-2">RSN (Required)</label>
+                            <input type="text" id="donor-rsn" required class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label for="gp-amount" class="block text-sm font-medium text-gray-300 mb-2">Amount GP (Required)</label>
+                            <input type="number" id="gp-amount" required min="1" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label for="pledge-note" class="block text-sm font-medium text-gray-300 mb-2">Note (Optional)</label>
+                            <input type="text" id="pledge-note" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-all hover:scale-105 focus:ring-4 focus:ring-purple-300" aria-label="Submit GP pledge">
+                            Pledge GP
+                        </button>
+                    </form>
+                    
+                    <div class="text-center space-y-2">
+                        <p class="text-sm text-gray-400">This is a pledge log. Please trade in-game to:</p>
+                        <button id="copy-treasurer" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 px-4 py-2 rounded-lg font-mono text-sm transition-colors focus:ring-2 focus:ring-cyan-500" aria-label="Copy treasurer RSN to clipboard">
+                            <span id="treasurer-rsn">Abyss-Treasurer</span> 📋
+                        </button>
+                        <button id="clear-pledges" class="block w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm transition-colors focus:ring-2 focus:ring-red-500" aria-label="Clear all local pledges">
+                            Clear Local Pledges
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pledges Display -->
+            <div class="mt-12 grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Recent Pledges -->
+                <div class="bg-gray-900 rounded-2xl p-6">
+                    <h5 class="text-xl font-semibold mb-4 text-cyan-400">Recent Pledges</h5>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-left py-2 text-gray-300">RSN</th>
+                                    <th class="text-right py-2 text-gray-300">Amount</th>
+                                    <th class="text-left py-2 text-gray-300">Note</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pledges-table" class="text-gray-300">
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-gray-500">No pledges yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Supporters -->
+                <div class="bg-gray-900 rounded-2xl p-6">
+                    <h5 class="text-xl font-semibold mb-4 text-purple-400">Top Supporters</h5>
+                    <div id="top-supporters" class="space-y-2">
+                        <p class="text-center py-4 text-gray-500">No supporters yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h3 class="text-4xl font-bold text-center mb-12 text-cyan-400">Shift Scheduler</h3>
+            
+            <!-- Tip Callout -->
+            <div id="schedule-tip" class="bg-purple-900 border border-purple-700 rounded-lg p-4 mb-8 max-w-4xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <p class="text-purple-200">💡 Tip: keep at least 8–12 members in rotation for fair coverage.</p>
+                    <button id="dismiss-tip" class="text-purple-400 hover:text-purple-300 ml-4" aria-label="Dismiss tip">✕</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
+                <!-- Roster Management -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-cyan-400">Roster Management</h4>
+                    <textarea id="roster-textarea" rows="10" placeholder="Enter one RSN per line..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
+                    <button id="save-roster" class="mt-4 w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-cyan-500" aria-label="Save roster to local storage">
+                        Save Roster
+                    </button>
+                </div>
+
+                <!-- Slot Builder -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h4 class="text-xl font-semibold mb-4 text-purple-400">Slot Builder</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="start-time" class="block text-sm font-medium text-gray-300 mb-2">Start Time (UTC)</label>
+                            <input type="datetime-local" id="start-time" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label for="end-time" class="block text-sm font-medium text-gray-300 mb-2">End Time (UTC)</label>
+                            <input type="datetime-local" id="end-time" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label for="world-select" class="block text-sm font-medium text-gray-300 mb-2">World</label>
+                            <select id="world-select" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="3">World 3</option>
+                                <option value="84">World 84</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="required-guardians" class="block text-sm font-medium text-gray-300 mb-2">Required Guardians</label>
+                            <input type="number" id="required-guardians" value="5" readonly class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-gray-400 cursor-not-allowed">
+                        </div>
+                        
+                        <button id="add-slot" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-purple-500" aria-label="Add new patrol slot">
+                            Add Slot
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment Controls -->
+            <div class="max-w-6xl mx-auto mb-8">
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <button id="assign-all" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-green-500" aria-label="Assign guardians to all unassigned slots">
+                        Assign All Unassigned Slots
+                    </button>
+                    <button id="export-csv" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-blue-500" aria-label="Export schedule as CSV">
+                        Export CSV
+                    </button>
+                    <button id="clear-schedule" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-red-500" aria-label="Clear entire schedule">
+                        Clear Schedule
+                    </button>
+                </div>
+            </div>
+
+            <!-- Local Time Display -->
+            <div class="text-center mb-8">
+                <p class="text-gray-400">All times are UTC. Your local time is: <span id="local-time" class="font-mono text-cyan-400"></span></p>
+            </div>
+
+            <!-- Schedule Table -->
+            <div class="bg-gray-800 rounded-2xl p-6 overflow-x-auto">
+                <h4 class="text-xl font-semibold mb-4 text-cyan-400">Patrol Schedule</h4>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 px-2 text-gray-300">Start (UTC)</th>
+                            <th class="text-left py-3 px-2 text-gray-300">End (UTC)</th>
+                            <th class="text-center py-3 px-2 text-gray-300">World</th>
+                            <th class="text-left py-3 px-2 text-gray-300">Assigned Guardians</th>
+                            <th class="text-center py-3 px-2 text-gray-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-table" class="text-gray-300">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">No patrol slots scheduled</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gray-800 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm mb-4">
+                RuneScape® is property of Jagex. This fan site is non-commercial community tooling. No RWT.
+            </p>
+            <a href="#" class="text-cyan-400 hover:text-cyan-300 text-sm transition-colors">
+                View on GitHub
+            </a>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite"></div>
+
+    <script>
+        // Constants & Storage Keys
+        const PAYPAL_LINK = "#";
+        const BMAC_LINK = "#";
+        const CLAN_TREASURER_RSN = "Abyss-Treasurer";
+        
+        const LS_KEYS = {
+            roster: 'abyss_roster',
+            slots: 'abyss_slots',
+            assignments: 'abyss_assignments',
+            pledges: 'abyss_pledges'
+        };
+
+        // State
+        let roster = [];
+        let slots = [];
+        let pledges = [];
+
+        // Utility Functions
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600';
+            toast.className = `${bgColor} text-white px-4 py-2 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+            toast.textContent = message;
+            toast.setAttribute('role', 'alert');
+            
+            document.getElementById('toast-container').appendChild(toast);
+            
+            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function formatDateTime(isoString) {
+            return new Date(isoString).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'UTC'
+            });
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // UTC Clock
+        function updateClock() {
+            const now = new Date();
+            const utcTime = now.toUTCString().slice(17, 25);
+            const utcDate = now.toUTCString().slice(0, 16);
+            document.getElementById('utc-clock').textContent = `${utcTime} UTC | ${utcDate}`;
+            
+            // Update local time display
+            const localTimeEl = document.getElementById('local-time');
+            if (localTimeEl) {
+                localTimeEl.textContent = now.toLocaleString();
+            }
+        }
+
+        // Storage Functions
+        function saveToStorage(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function loadFromStorage(key, defaultValue = []) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+
+        // Roster Management
+        function loadRoster() {
+            roster = loadFromStorage(LS_KEYS.roster, [
+                'Rx_Bibby',
+                'Abyss_Sentinel', 
+                'Rift_Warden',
+                'Ether_Knight',
+                'Void_Sabre'
+            ]);
+            document.getElementById('roster-textarea').value = roster.join('\n');
+        }
+
+        function saveRoster() {
+            const text = document.getElementById('roster-textarea').value;
+            roster = text.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0)
+                .filter((name, index, arr) => arr.indexOf(name) === index); // Remove duplicates
+            
+            saveToStorage(LS_KEYS.roster, roster);
+            document.getElementById('roster-textarea').value = roster.join('\n');
+            showToast(`Roster saved with ${roster.length} members`, 'success');
+        }
+
+        // Slot Management
+        function loadSlots() {
+            slots = loadFromStorage(LS_KEYS.slots, []);
+            if (slots.length === 0) {
+                // Add default slots
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                slots.push({
+                    id: generateId(),
+                    startUtcISO: new Date(today.getTime() + 14 * 60 * 60 * 1000).toISOString(),
+                    endUtcISO: new Date(today.getTime() + 16 * 60 * 60 * 1000).toISOString(),
+                    world: 3,
+                    assigned: []
+                });
+                
+                slots.push({
+                    id: generateId(),
+                    startUtcISO: new Date(today.getTime() + 18 * 60 * 60 * 1000).toISOString(),
+                    endUtcISO: new Date(today.getTime() + 20 * 60 * 60 * 1000).toISOString(),
+                    world: 84,
+                    assigned: []
+                });
+                
+                saveToStorage(LS_KEYS.slots, slots);
+            }
+            renderScheduleTable();
+        }
+
+        function addSlot() {
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const world = parseInt(document.getElementById('world-select').value);
+            
+            if (!startTime || !endTime) {
+                showToast('Please fill in both start and end times', 'error');
+                return;
+            }
+            
+            const startDate = new Date(startTime);
+            const endDate = new Date(endTime);
+            
+            if (startDate >= endDate) {
+                showToast('Start time must be before end time', 'error');
+                return;
+            }
+            
+            if (![3, 84].includes(world)) {
+                showToast('World must be 3 or 84', 'error');
+                return;
+            }
+            
+            const slot = {
+                id: generateId(),
+                startUtcISO: startDate.toISOString(),
+                endUtcISO: endDate.toISOString(),
+                world: world,
+                assigned: []
+            };
+            
+            slots.push(slot);
+            saveToStorage(LS_KEYS.slots, slots);
+            renderScheduleTable();
+            
+            // Clear form
+            document.getElementById('start-time').value = '';
+            document.getElementById('end-time').value = '';
+            
+            showToast('Patrol slot added successfully', 'success');
+        }
+
+        // Assignment Logic
+        function getAssignmentCounts() {
+            const counts = {};
+            roster.forEach(name => counts[name] = 0);
+            
+            slots.forEach(slot => {
+                slot.assigned.forEach(name => {
+                    if (counts[name] !== undefined) {
+                        counts[name]++;
+                    }
+                });
+            });
+            
+            return counts;
+        }
+
+        function isAdjacent(slot1, slot2) {
+            const slot1End = new Date(slot1.endUtcISO);
+            const slot2Start = new Date(slot2.startUtcISO);
+            const timeDiff = Math.abs(slot2Start - slot1End) / (1000 * 60 * 60); // hours
+            return timeDiff <= 2;
+        }
+
+        function assignSlot(slot) {
+            const counts = getAssignmentCounts();
+            const available = roster.filter(name => !slot.assigned.includes(name));
+            
+            if (available.length === 0) {
+                return [];
+            }
+            
+            // Find adjacent slots
+            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            const slotIndex = sortedSlots.findIndex(s => s.id === slot.id);
+            const adjacentSlots = [];
+            
+            if (slotIndex > 0 && isAdjacent(sortedSlots[slotIndex - 1], slot)) {
+                adjacentSlots.push(sortedSlots[slotIndex - 1]);
+            }
+            if (slotIndex < sortedSlots.length - 1 && isAdjacent(slot, sortedSlots[slotIndex + 1])) {
+                adjacentSlots.push(sortedSlots[slotIndex + 1]);
+            }
+            
+            const adjacentAssigned = new Set();
+            adjacentSlots.forEach(adjSlot => {
+                adjSlot.assigned.forEach(name => adjacentAssigned.add(name));
+            });
+            
+            // Prefer non-adjacent members
+            let candidates = available.filter(name => !adjacentAssigned.has(name));
+            if (candidates.length < 5) {
+                candidates = available; // Fallback to all available
+            }
+            
+            // Sort by assignment count
+            candidates.sort((a, b) => counts[a] - counts[b]);
+            
+            const assigned = [];
+            const needed = Math.min(5, candidates.length);
+            
+            // Group by count and pick randomly within each group
+            let currentCount = counts[candidates[0]] || 0;
+            let currentGroup = [];
+            
+            for (const candidate of candidates) {
+                if ((counts[candidate] || 0) === currentCount) {
+                    currentGroup.push(candidate);
+                } else {
+                    // Pick from current group
+                    while (currentGroup.length > 0 && assigned.length < needed) {
+                        const randomIndex = Math.floor(Math.random() * currentGroup.length);
+                        assigned.push(currentGroup.splice(randomIndex, 1)[0]);
+                    }
+                    
+                    if (assigned.length >= needed) break;
+                    
+                    currentCount = counts[candidate] || 0;
+                    currentGroup = [candidate];
+                }
+            }
+            
+            // Pick remaining from last group
+            while (currentGroup.length > 0 && assigned.length < needed) {
+                const randomIndex = Math.floor(Math.random() * currentGroup.length);
+                assigned.push(currentGroup.splice(randomIndex, 1)[0]);
+            }
+            
+            return assigned;
+        }
+
+        function assignAllSlots() {
+            if (roster.length === 0) {
+                showToast('No members in roster', 'error');
+                return;
+            }
+            
+            if (roster.length < 5) {
+                showToast('Warning: Roster has fewer than 5 members', 'error');
+            }
+            
+            let assignedCount = 0;
+            slots.forEach(slot => {
+                if (slot.assigned.length === 0) {
+                    slot.assigned = assignSlot(slot);
+                    if (slot.assigned.length > 0) {
+                        assignedCount++;
+                    }
+                }
+            });
+            
+            saveToStorage(LS_KEYS.slots, slots);
+            renderScheduleTable();
+            
+            if (assignedCount > 0) {
+                showToast(`Assigned guardians to ${assignedCount} slot(s)`, 'success');
+            } else {
+                showToast('No unassigned slots found', 'info');
+            }
+        }
+
+        function rerollSlot(slotId) {
+            const slot = slots.find(s => s.id === slotId);
+            if (!slot) return;
+            
+            slot.assigned = assignSlot(slot);
+            saveToStorage(LS_KEYS.slots, slots);
+            renderScheduleTable();
+            showToast('Slot re-rolled', 'success');
+        }
+
+        function clearSchedule() {
+            if (confirm('Are you sure you want to clear the entire schedule? This cannot be undone.')) {
+                slots = [];
+                saveToStorage(LS_KEYS.slots, slots);
+                renderScheduleTable();
+                showToast('Schedule cleared', 'success');
+            }
+        }
+
+        function exportCSV() {
+            if (slots.length === 0) {
+                showToast('No slots to export', 'error');
+                return;
+            }
+            
+            const headers = ['Start (UTC)', 'End (UTC)', 'World', 'Guardian 1', 'Guardian 2', 'Guardian 3', 'Guardian 4', 'Guardian 5'];
+            const rows = [headers];
+            
+            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            
+            sortedSlots.forEach(slot => {
+                const row = [
+                    formatDateTime(slot.startUtcISO),
+                    formatDateTime(slot.endUtcISO),
+                    slot.world.toString(),
+                    slot.assigned[0] || '',
+                    slot.assigned[1] || '',
+                    slot.assigned[2] || '',
+                    slot.assigned[3] || '',
+                    slot.assigned[4] || ''
+                ];
+                rows.push(row);
+            });
+            
+            const csvContent = rows.map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `abyss_guardians_schedule_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Schedule exported', 'success');
+        }
+
+        function renderScheduleTable() {
+            const tbody = document.getElementById('schedule-table');
+            
+            if (slots.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No patrol slots scheduled</td></tr>';
+                return;
+            }
+            
+            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            
+            tbody.innerHTML = sortedSlots.map(slot => {
+                const worldColor = slot.world === 3 ? 'bg-cyan-600' : 'bg-purple-600';
+                const isUnderstaffed = slot.assigned.length < 5;
+                
+                return `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-3 px-2 font-mono">${formatDateTime(slot.startUtcISO)}</td>
+                        <td class="py-3 px-2 font-mono">${formatDateTime(slot.endUtcISO)}</td>
+                        <td class="py-3 px-2 text-center">
+                            <span class="${worldColor} text-white px-2 py-1 rounded text-xs font-semibold">
+                                ${slot.world}
+                            </span>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex flex-wrap gap-1">
+                                ${slot.assigned.map(name => 
+                                    `<span class="bg-gray-700 text-cyan-400 px-2 py-1 rounded-full text-xs">
+                                        🗡️ ${name}
+                                    </span>`
+                                ).join('')}
+                                ${isUnderstaffed ? 
+                                    `<span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs">
+                                        UNDER-STAFFED
+                                    </span>` : ''
+                                }
+                            </div>
+                        </td>
+                        <td class="py-3 px-2 text-center">
+                            <button 
+                                onclick="rerollSlot('${slot.id}')" 
+                                class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-xs transition-colors"
+                                aria-label="Re-roll assignments for this slot"
+                            >
+                                Re-roll
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // GP Pledges
+        function loadPledges() {
+            pledges = loadFromStorage(LS_KEYS.pledges, []);
+            renderPledges();
+        }
+
+        function addPledge(rsn, amount, note) {
+            const pledge = {
+                id: generateId(),
+                rsn: rsn.trim(),
+                amount: parseInt(amount),
+                note: note.trim(),
+                timestamp: new Date().toISOString()
+            };
+            
+            pledges.push(pledge);
+            saveToStorage(LS_KEYS.pledges, pledges);
+            renderPledges();
+        }
+
+        function clearPledges() {
+            if (confirm('Are you sure you want to clear all local pledges? This cannot be undone.')) {
+                pledges = [];
+                saveToStorage(LS_KEYS.pledges, pledges);
+                renderPledges();
+                showToast('Local pledges cleared', 'success');
+            }
+        }
+
+        function renderPledges() {
+            // Recent pledges table
+            const tableBody = document.getElementById('pledges-table');
+            if (pledges.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">No pledges yet</td></tr>';
+            } else {
+                const recentPledges = pledges.slice(-10).reverse();
+                tableBody.innerHTML = recentPledges.map(pledge => `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-2">${pledge.rsn}</td>
+                        <td class="py-2 text-right font-mono">${pledge.amount.toLocaleString()} GP</td>
+                        <td class="py-2">${pledge.note || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Top supporters
+            const supportersDiv = document.getElementById('top-supporters');
+            if (pledges.length === 0) {
+                supportersDiv.innerHTML = '<p class="text-center py-4 text-gray-500">No supporters yet</p>';
+            } else {
+                const totals = {};
+                pledges.forEach(pledge => {
+                    totals[pledge.rsn] = (totals[pledge.rsn] || 0) + pledge.amount;
+                });
+                
+                const sorted = Object.entries(totals)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 10);
+                
+                supportersDiv.innerHTML = sorted.map(([rsn, total], index) => `
+                    <div class="flex justify-between items-center py-2 px-3 bg-gray-800 rounded-lg">
+                        <span class="flex items-center">
+                            <span class="text-purple-400 font-bold mr-2">#${index + 1}</span>
+                            <span>${rsn}</span>
+                        </span>
+                        <span class="font-mono text-cyan-400">${total.toLocaleString()} GP</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function copyTreasurerRSN() {
+            navigator.clipboard.writeText(CLAN_TREASURER_RSN).then(() => {
+                showToast('Treasurer RSN copied to clipboard', 'success');
+            }).catch(() => {
+                showToast('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up donation button links
+            document.getElementById('paypal-btn').href = PAYPAL_LINK;
+            document.getElementById('bmac-btn').href = BMAC_LINK;
+            document.getElementById('treasurer-rsn').textContent = CLAN_TREASURER_RSN;
+            
+            // Load data
+            loadRoster();
+            loadSlots();
+            loadPledges();
+            
+            // Set up event listeners
+            document.getElementById('save-roster').addEventListener('click', saveRoster);
+            document.getElementById('add-slot').addEventListener('click', addSlot);
+            document.getElementById('assign-all').addEventListener('click', assignAllSlots);
+            document.getElementById('export-csv').addEventListener('click', exportCSV);
+            document.getElementById('clear-schedule').addEventListener('click', clearSchedule);
+            document.getElementById('copy-treasurer').addEventListener('click', copyTreasurerRSN);
+            document.getElementById('clear-pledges').addEventListener('click', clearPledges);
+            
+            // GP Pledge form
+            document.getElementById('gp-pledge-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const rsn = document.getElementById('donor-rsn').value.trim();
+                const amount = document.getElementById('gp-amount').value;
+                const note = document.getElementById('pledge-note').value.trim();
+                
+                if (!rsn || !amount || amount <= 0) {
+                    showToast('Please fill in RSN and a valid GP amount', 'error');
+                    return;
+                }
+                
+                addPledge(rsn, amount, note);
+                this.reset();
+                showToast('GP pledge added', 'success');
+            });
+            
+            // Dismiss tip
+            document.getElementById('dismiss-tip').addEventListener('click', function() {
+                document.getElementById('schedule-tip').style.display = 'none';
+            });
+            
+            // Start clock
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        // Make rerollSlot available globally for onclick handlers
+        window.rerollSlot = rerollSlot;
+    </script>
+</body>
+</html>
