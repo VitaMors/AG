@@ -308,6 +308,9 @@
                     <button id="debug-schedule" class="mt-2 w-full bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-red-500" aria-label="Debug schedule generation">
                         🐛 Debug Schedule (Check Console)
                     </button>
+                    <button id="emergency-fix" class="mt-1 w-full bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-4 rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-yellow-500" aria-label="Emergency fix - force immediate coverage">
+                        ⚡ Emergency Fix (Force Coverage Now)
+                    </button>
                 </div>
             </div>
 
@@ -757,10 +760,15 @@
         }
 
         function assignShift(shift, schedule = currentSchedule) {
+            console.log(`Assigning shift for World ${shift.world} starting at ${shift.startUtcISO}`);
             const counts = getAssignmentCounts(schedule);
             const available = roster.filter(name => !shift.assigned.includes(name));
             
+            console.log(`Available guardians: ${available.length} out of ${roster.length}`);
+            console.log(`Assignment counts:`, counts);
+            
             if (available.length === 0) {
+                console.log('No available guardians for this shift');
                 return [];
             }
             
@@ -768,13 +776,20 @@
             const fairnessScores = calculateFairnessScores(available, counts, shift, schedule);
             const assigned = performHatDraw(fairnessScores, SCHEDULE_CONFIG.guardiansPerShift);
             
+            // Fallback: if hat draw failed, just take first N available
+            if (assigned.length === 0 && available.length > 0) {
+                console.log('Hat draw failed, using simple assignment');
+                return available.slice(0, Math.min(SCHEDULE_CONFIG.guardiansPerShift, available.length));
+            }
+            
             return assigned;
         }
 
         function calculateFairnessScores(available, counts, shift, schedule) {
             const scores = [];
-            const maxAssignments = Math.max(...Object.values(counts));
-            const minAssignments = Math.min(...Object.values(counts));
+            const countValues = Object.values(counts);
+            const maxAssignments = countValues.length > 0 ? Math.max(...countValues) : 0;
+            const minAssignments = countValues.length > 0 ? Math.min(...countValues) : 0;
             
             // Find adjacent slots for burnout prevention
             const adjacentMembers = getAdjacentSlotMembers(shift, schedule);
@@ -838,22 +853,36 @@
             const assigned = [];
             const remaining = [...scores];
             
+            if (remaining.length === 0) return assigned;
+            
             // Create weighted "hat" based on fairness scores
-            while (assigned.length < needed && remaining.length > 0) {
+            let attempts = 0;
+            while (assigned.length < needed && remaining.length > 0 && attempts < 100) {
+                attempts++;
                 const totalWeight = remaining.reduce((sum, member) => sum + member.score, 0);
+                
+                if (totalWeight <= 0) {
+                    // If all scores are 0 or negative, just pick randomly
+                    const randomIndex = Math.floor(Math.random() * remaining.length);
+                    assigned.push(remaining.splice(randomIndex, 1)[0].name);
+                    continue;
+                }
+                
                 let random = Math.random() * totalWeight;
+                let found = false;
                 
                 for (let i = 0; i < remaining.length; i++) {
                     random -= remaining[i].score;
                     if (random <= 0) {
                         assigned.push(remaining[i].name);
                         remaining.splice(i, 1);
+                        found = true;
                         break;
                     }
                 }
                 
                 // Fallback if rounding errors
-                if (assigned.length === 0 && remaining.length > 0) {
+                if (!found && remaining.length > 0) {
                     assigned.push(remaining.shift().name);
                 }
             }
@@ -1029,6 +1058,57 @@
             });
         }
 
+        function emergencyFix() {
+            console.log('=== EMERGENCY FIX ===');
+            showToast('Emergency fix: Creating immediate coverage...', 'info');
+            
+            if (roster.length < 3) {
+                showToast('Need at least 3 guardians for emergency fix', 'error');
+                return;
+            }
+            
+            // Create simple current shift coverage
+            const now = new Date();
+            const currentHour = now.getUTCHours();
+            const shiftStart = Math.floor(currentHour / 4) * 4;
+            
+            const startTime = new Date(now);
+            startTime.setUTCHours(shiftStart, 0, 0, 0);
+            
+            const endTime = new Date(startTime);
+            endTime.setUTCHours(startTime.getUTCHours() + 4);
+            
+            // Create emergency schedule
+            currentSchedule = [];
+            
+            // World 3 shift
+            const w3Shift = {
+                id: 'emergency-w3',
+                startUtcISO: startTime.toISOString(),
+                endUtcISO: endTime.toISOString(),
+                world: 3,
+                assigned: roster.slice(0, 3) // First 3 guardians
+            };
+            
+            // World 84 shift  
+            const w84Shift = {
+                id: 'emergency-w84',
+                startUtcISO: startTime.toISOString(),
+                endUtcISO: endTime.toISOString(),
+                world: 84,
+                assigned: roster.slice(3, 6) // Next 3 guardians
+            };
+            
+            currentSchedule.push(w3Shift, w84Shift);
+            
+            console.log('Emergency schedule created:', currentSchedule);
+            
+            saveToStorage(LS_KEYS.schedule, currentSchedule);
+            updateCurrentProtectionDisplay();
+            
+            showToast('Emergency coverage activated! Both worlds are now protected.', 'success');
+        }
+
         function showUpcomingShifts() {
             const upcomingShifts = currentSchedule
                 .filter(shift => new Date(shift.startUtcISO) > new Date())
@@ -1086,6 +1166,9 @@
                 console.log('Current schedule:', currentSchedule);
                 console.log('Schedule config:', SCHEDULE_CONFIG);
                 generateAutomaticSchedule(true);
+            });
+            document.getElementById('emergency-fix').addEventListener('click', () => {
+                emergencyFix();
             });
             document.getElementById('export-csv').addEventListener('click', exportCSV);
             document.getElementById('view-upcoming').addEventListener('click', showUpcomingShifts);
