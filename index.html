@@ -574,63 +574,109 @@
             showToast(`Roster saved with ${roster.length} members`, 'success');
         }
 
-        // Automatic Schedule Generation
+        // Automatic Schedule Generation (Simplified & Reliable)
         function generateAutomaticSchedule(forceRegenerate = false) {
-            const lastGeneration = loadFromStorage(LS_KEYS.lastScheduleGeneration, 0);
-            const now = Date.now();
-            const regenerateInterval = SCHEDULE_CONFIG.regenerateIntervalHours * 60 * 60 * 1000;
+            console.log('=== GENERATE AUTOMATIC SCHEDULE ===');
             
-            // Check if we need to regenerate
-            if (!forceRegenerate && (now - lastGeneration) < regenerateInterval) {
-                currentSchedule = loadFromStorage(LS_KEYS.schedule, []);
-                if (currentSchedule.length > 0) {
-                    updateCurrentProtectionDisplay();
-                    return;
-                }
-            }
-            
-            if (roster.length < SCHEDULE_CONFIG.guardiansPerShift) {
-                showToast(`Need at least ${SCHEDULE_CONFIG.guardiansPerShift} clan members for automatic scheduling`, 'error');
+            if (roster.length < 3) {
+                showToast(`Need at least 3 clan members for scheduling, only have ${roster.length}`, 'error');
                 return;
             }
             
-            showToast('Generating protection schedule...', 'info');
+            showToast('Generating 24/7 protection schedule...', 'info');
             
+            // Simple approach: Create immediate coverage that works like emergency debug
+            const now = new Date();
             const schedule = [];
-            const startTime = getNextShiftStart();
-            const totalShifts = (SCHEDULE_CONFIG.daysAhead * 24) / SCHEDULE_CONFIG.shiftDurationHours;
             
-            console.log(`Generating schedule starting from: ${startTime.toISOString()}`);
-            console.log(`Total shifts to generate: ${totalShifts}`);
-            console.log(`Roster size: ${roster.length}`);
+            // Create current shift that definitely covers NOW
+            const currentShiftStart = new Date(now.getTime() - (30 * 60 * 1000)); // 30 min ago
+            const currentShiftEnd = new Date(now.getTime() + (4 * 60 * 60 * 1000)); // 4 hours from now
             
-            // Generate shifts for both worlds
-            for (let shiftIndex = 0; shiftIndex < totalShifts; shiftIndex++) {
-                const shiftStart = new Date(startTime.getTime() + (shiftIndex * SCHEDULE_CONFIG.shiftDurationHours * 60 * 60 * 1000));
-                const shiftEnd = new Date(shiftStart.getTime() + (SCHEDULE_CONFIG.shiftDurationHours * 60 * 60 * 1000));
+            // World 3 current shift - use first 3 guardians
+            const w3Guardians = roster.slice(0, Math.min(3, roster.length));
+            const w3CurrentShift = {
+                id: 'auto-w3-current-' + Date.now(),
+                startUtcISO: currentShiftStart.toISOString(),
+                endUtcISO: currentShiftEnd.toISOString(),
+                world: 3,
+                assigned: w3Guardians
+            };
+            
+            // World 84 current shift - use next 3 guardians (or repeat if not enough)
+            let w84Guardians;
+            if (roster.length >= 6) {
+                w84Guardians = roster.slice(3, 6);
+            } else {
+                // If less than 6 guardians, use different ones or repeat
+                w84Guardians = roster.slice(0, Math.min(3, roster.length));
+            }
+            
+            const w84CurrentShift = {
+                id: 'auto-w84-current-' + Date.now(),
+                startUtcISO: currentShiftStart.toISOString(),
+                endUtcISO: currentShiftEnd.toISOString(),
+                world: 84,
+                assigned: w84Guardians
+            };
+            
+            schedule.push(w3CurrentShift, w84CurrentShift);
+            
+            // Generate next 6 shifts (24 hours coverage)
+            for (let shiftNum = 1; shiftNum <= 6; shiftNum++) {
+                const shiftStart = new Date(currentShiftEnd.getTime() + ((shiftNum - 1) * 4 * 60 * 60 * 1000));
+                const shiftEnd = new Date(shiftStart.getTime() + (4 * 60 * 60 * 1000));
                 
-                SCHEDULE_CONFIG.worlds.forEach(world => {
-                    const shift = {
-                        id: generateId(),
-                        startUtcISO: shiftStart.toISOString(),
-                        endUtcISO: shiftEnd.toISOString(),
-                        world: world,
-                        assigned: []
-                    };
+                // Rotate guardians for variety
+                const rotationOffset = shiftNum % Math.max(1, Math.floor(roster.length / 3));
+                
+                const w3NextGuardians = [];
+                const w84NextGuardians = [];
+                
+                // Assign guardians with rotation
+                for (let i = 0; i < 3; i++) {
+                    const w3Index = (rotationOffset * 3 + i) % roster.length;
+                    const w84Index = ((rotationOffset + 1) * 3 + i) % roster.length;
                     
-                    schedule.push(shift);
+                    if (w3Index < roster.length) w3NextGuardians.push(roster[w3Index]);
+                    if (w84Index < roster.length) w84NextGuardians.push(roster[w84Index]);
+                }
+                
+                // Ensure we always have at least one guardian
+                if (w3NextGuardians.length === 0) w3NextGuardians.push(roster[0]);
+                if (w84NextGuardians.length === 0) w84NextGuardians.push(roster[0]);
+                
+                schedule.push({
+                    id: `auto-w3-shift${shiftNum}-` + Date.now(),
+                    startUtcISO: shiftStart.toISOString(),
+                    endUtcISO: shiftEnd.toISOString(),
+                    world: 3,
+                    assigned: w3NextGuardians
+                });
+                
+                schedule.push({
+                    id: `auto-w84-shift${shiftNum}-` + Date.now(),
+                    startUtcISO: shiftStart.toISOString(),
+                    endUtcISO: shiftEnd.toISOString(),
+                    world: 84,
+                    assigned: w84NextGuardians
                 });
             }
             
-            // Assign guardians to all shifts
-            assignAllShifts(schedule);
+            console.log('✅ Generated reliable schedule:', schedule.length, 'shifts');
+            console.log('Current W3 shift:', w3CurrentShift);
+            console.log('Current W84 shift:', w84CurrentShift);
             
             currentSchedule = schedule;
             saveToStorage(LS_KEYS.schedule, currentSchedule);
-            saveToStorage(LS_KEYS.lastScheduleGeneration, now);
+            saveToStorage(LS_KEYS.lastScheduleGeneration, Date.now());
             
-            updateCurrentProtectionDisplay();
-            showToast(`Generated ${totalShifts} shifts for ${SCHEDULE_CONFIG.daysAhead} days`, 'success');
+            // Force immediate display update
+            setTimeout(() => {
+                updateCurrentProtectionDisplay();
+            }, 100);
+            
+            showToast(`✅ 24/7 Protection Active! W3: ${w3Guardians.join(', ')} | W84: ${w84Guardians.join(', ')}`, 'success');
         }
         
         function getNextShiftStart() {
@@ -693,21 +739,17 @@
         }
 
         function getCurrentShift(world, currentTime) {
-            console.log(`Looking for current shift for World ${world} at ${currentTime.toISOString()}`);
-            
+            // Simplified and more reliable current shift detection
             const currentShift = currentSchedule.find(shift => {
+                if (shift.world !== world) return false;
+                
                 const start = new Date(shift.startUtcISO);
                 const end = new Date(shift.endUtcISO);
-                const isRightWorld = shift.world === world;
-                const isCurrentTime = currentTime >= start && currentTime < end;
+                const isActive = currentTime >= start && currentTime < end;
                 
-                console.log(`Checking shift: World ${shift.world}, ${start.toISOString()} to ${end.toISOString()}`);
-                console.log(`  Right world: ${isRightWorld}, Right time: ${isCurrentTime}, Assigned: ${shift.assigned.length}`);
-                
-                return isRightWorld && isCurrentTime;
+                return isActive && shift.assigned.length > 0; // Must have assigned guardians
             });
             
-            console.log(`Found current shift for World ${world}:`, currentShift);
             return currentShift;
         }
 
@@ -1181,8 +1223,11 @@
             await loadRoster();
             loadPledges();
             
-            // Generate initial schedule
-            generateAutomaticSchedule();
+            // Auto-generate schedule immediately with current roster
+            setTimeout(() => {
+                console.log('🚀 Auto-generating schedule on page load...');
+                generateAutomaticSchedule(true); // Force generation
+            }, 1000);
             
             // Set up event listeners
             document.getElementById('refresh-roster').addEventListener('click', refreshRoster);
