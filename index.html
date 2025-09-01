@@ -311,6 +311,9 @@
                     <button id="emergency-fix" class="mt-1 w-full bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-4 rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-yellow-500" aria-label="Emergency fix - force immediate coverage">
                         ⚡ Emergency Fix (Force Coverage Now)
                     </button>
+                    <button id="super-debug" class="mt-1 w-full bg-red-800 hover:bg-red-900 text-white py-1 px-4 rounded-lg text-xs font-semibold transition-colors" onclick="superDebug()">
+                        🔥 SUPER DEBUG (Force Everything)
+                    </button>
                 </div>
             </div>
 
@@ -1254,6 +1257,52 @@
                 console.log('Initialization completed');
             }, 500);
         });
+
+        // Global debug function
+        window.superDebug = function() {
+            console.log('🔥 SUPER DEBUG ACTIVATED 🔥');
+            
+            // Force UTC clock
+            const clockEl = document.getElementById('utc-clock');
+            if (clockEl) {
+                const now = new Date();
+                clockEl.textContent = `${now.toUTCString().slice(17, 25)} UTC`;
+                console.log('✅ UTC Clock forced');
+            } else {
+                console.log('❌ UTC Clock element not found');
+            }
+            
+            // Force roster
+            roster = ['Guardian1', 'Guardian2', 'Guardian3', 'Guardian4', 'Guardian5', 'Guardian6'];
+            console.log('✅ Roster forced:', roster);
+            
+            // Force immediate protection display
+            const w3Status = document.getElementById('w3-status');
+            const w3Guardians = document.getElementById('w3-guardians');
+            const w3ShiftTime = document.getElementById('w3-shift-time');
+            
+            const w84Status = document.getElementById('w84-status');
+            const w84Guardians = document.getElementById('w84-guardians');
+            const w84ShiftTime = document.getElementById('w84-shift-time');
+            
+            if (w3Status && w3Guardians && w3ShiftTime) {
+                w3Status.innerHTML = '🛡️ ACTIVE';
+                w3Status.className = 'px-3 py-1 rounded-full text-sm bg-green-600 text-white';
+                w3ShiftTime.textContent = 'FORCED ACTIVE';
+                w3Guardians.innerHTML = '<span class="bg-gray-700 text-cyan-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian1</span><span class="bg-gray-700 text-cyan-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian2</span><span class="bg-gray-700 text-cyan-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian3</span>';
+                console.log('✅ World 3 display forced');
+            }
+            
+            if (w84Status && w84Guardians && w84ShiftTime) {
+                w84Status.innerHTML = '🛡️ ACTIVE';
+                w84Status.className = 'px-3 py-1 rounded-full text-sm bg-green-600 text-white';
+                w84ShiftTime.textContent = 'FORCED ACTIVE';
+                w84Guardians.innerHTML = '<span class="bg-gray-700 text-purple-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian4</span><span class="bg-gray-700 text-purple-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian5</span><span class="bg-gray-700 text-purple-400 px-2 py-1 rounded-full text-xs">🗡️ Guardian6</span>';
+                console.log('✅ World 84 display forced');
+            }
+            
+            alert('🔥 SUPER DEBUG COMPLETE! Both worlds should now show ACTIVE protection!');
+        };
 
         // Make rerollSlot available globally for onclick handlers
         window.rerollSlot = rerollSlot;
