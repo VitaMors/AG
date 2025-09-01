@@ -213,7 +213,10 @@
             <!-- Tip Callout -->
             <div id="schedule-tip" class="bg-purple-900 border border-purple-700 rounded-lg p-4 mb-8 max-w-4xl mx-auto">
                 <div class="flex items-center justify-between">
-                    <p class="text-purple-200">💡 Tip: keep at least 8–12 members in rotation for fair coverage.</p>
+                    <div>
+                        <p class="text-purple-200">🎩 <strong>Smart Hat Draw System:</strong> Fair scheduling with burnout prevention</p>
+                        <p class="text-purple-300 text-sm mt-1">Members with fewer assignments get higher chances • Prevents back-to-back shifts • Auto-syncs with clan roster when available</p>
+                    </div>
                     <button id="dismiss-tip" class="text-purple-400 hover:text-purple-300 ml-4" aria-label="Dismiss tip">✕</button>
                 </div>
             </div>
@@ -221,11 +224,34 @@
             <div class="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
                 <!-- Roster Management -->
                 <div class="bg-gray-800 rounded-2xl p-6">
-                    <h4 class="text-xl font-semibold mb-4 text-cyan-400">Roster Management</h4>
-                    <textarea id="roster-textarea" rows="10" placeholder="Enter one RSN per line..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent"></textarea>
-                    <button id="save-roster" class="mt-4 w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-cyan-500" aria-label="Save roster to local storage">
-                        Save Roster
-                    </button>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xl font-semibold text-cyan-400">Roster Management</h4>
+                        <div class="flex items-center space-x-2">
+                            <span id="api-status" class="px-2 py-1 rounded-full text-xs bg-orange-600 text-white">Placeholder Mode</span>
+                            <span id="roster-count-badge" class="px-2 py-1 rounded-full text-xs bg-purple-600 text-white">15 Members</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-300">RuneScape Clan API:</span>
+                            <span id="api-toggle" class="text-gray-500">Disabled (No Clan Yet)</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Will auto-sync when clan is created
+                        </div>
+                    </div>
+                    
+                    <textarea id="roster-textarea" rows="8" placeholder="Clan members will appear here..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent" readonly></textarea>
+                    
+                    <div class="mt-4 flex space-x-2">
+                        <button id="refresh-roster" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-blue-500" aria-label="Refresh clan member list">
+                            🔄 Refresh List
+                        </button>
+                        <button id="save-roster" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-cyan-500" aria-label="Save manual roster changes">
+                            💾 Save Manual
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Slot Builder -->
@@ -325,12 +351,21 @@
         const PAYPAL_LINK = "#";
         const BMAC_LINK = "#";
         const CLAN_TREASURER_RSN = "Abyss-Treasurer";
+        const CLAN_NAME = "Abyss Guardians"; // For future API integration
         
         const LS_KEYS = {
             roster: 'abyss_roster',
             slots: 'abyss_slots',
             assignments: 'abyss_assignments',
-            pledges: 'abyss_pledges'
+            pledges: 'abyss_pledges',
+            lastApiUpdate: 'abyss_last_api_update'
+        };
+
+        // RuneScape API Configuration (for future use)
+        const RS_API = {
+            clanMembersEndpoint: `https://secure.runescape.com/m=clan-hiscores/members_lite.ws?clanName=${encodeURIComponent(CLAN_NAME)}`,
+            cacheTimeout: 15 * 60 * 1000, // 15 minutes
+            enabled: false // Set to true when clan is created
         };
 
         // State
@@ -398,15 +433,113 @@
         }
 
         // Roster Management
-        function loadRoster() {
-            roster = loadFromStorage(LS_KEYS.roster, [
+        async function fetchClanMembers() {
+            if (!RS_API.enabled) {
+                return getPlaceholderRoster();
+            }
+
+            try {
+                const lastUpdate = loadFromStorage(LS_KEYS.lastApiUpdate, 0);
+                const now = Date.now();
+                
+                // Check if we need to update (cache timeout)
+                if (now - lastUpdate < RS_API.cacheTimeout) {
+                    return loadFromStorage(LS_KEYS.roster, getPlaceholderRoster());
+                }
+
+                showToast('Fetching latest clan member list...', 'info');
+                
+                const response = await fetch(RS_API.clanMembersEndpoint);
+                if (!response.ok) throw new Error('API request failed');
+                
+                const data = await response.text();
+                const members = parseClanData(data);
+                
+                if (members.length > 0) {
+                    saveToStorage(LS_KEYS.roster, members);
+                    saveToStorage(LS_KEYS.lastApiUpdate, now);
+                    showToast(`Updated roster: ${members.length} clan members`, 'success');
+                    return members;
+                }
+            } catch (error) {
+                console.error('Failed to fetch clan members:', error);
+                showToast('Using cached roster - API unavailable', 'error');
+            }
+            
+            return loadFromStorage(LS_KEYS.roster, getPlaceholderRoster());
+        }
+
+        function parseClanData(csvData) {
+            // Parse RuneScape clan CSV format
+            const lines = csvData.split('\n').slice(1); // Skip header
+            return lines
+                .map(line => line.split(',')[0]?.trim()) // First column is username
+                .filter(name => name && name.length > 0)
+                .slice(0, 50); // Limit to 50 members for performance
+        }
+
+        function getPlaceholderRoster() {
+            return [
                 'Rx_Bibby',
                 'Abyss_Sentinel', 
                 'Rift_Warden',
                 'Ether_Knight',
-                'Void_Sabre'
-            ]);
+                'Void_Sabre',
+                'Shadow_Hunter',
+                'Rune_Guardian',
+                'Chaos_Slayer',
+                'Void_Walker',
+                'Dark_Protector',
+                'Essence_Keeper',
+                'Abyss_Warden',
+                'Soul_Defender',
+                'Rift_Master',
+                'Chaos_Guardian'
+            ];
+        }
+
+        async function loadRoster() {
+            roster = await fetchClanMembers();
             document.getElementById('roster-textarea').value = roster.join('\n');
+            updateRosterDisplay();
+        }
+
+        function updateRosterDisplay() {
+            const countBadge = document.getElementById('roster-count-badge');
+            const apiStatus = document.getElementById('api-status');
+            const apiToggle = document.getElementById('api-toggle');
+            
+            if (countBadge) {
+                countBadge.textContent = `${roster.length} Members`;
+            }
+            
+            if (apiStatus && apiToggle) {
+                if (RS_API.enabled) {
+                    apiStatus.textContent = 'Live Sync';
+                    apiStatus.className = 'px-2 py-1 rounded-full text-xs bg-green-600 text-white';
+                    apiToggle.textContent = 'Active';
+                    apiToggle.className = 'text-green-400';
+                } else {
+                    apiStatus.textContent = 'Placeholder Mode';
+                    apiStatus.className = 'px-2 py-1 rounded-full text-xs bg-orange-600 text-white';
+                    apiToggle.textContent = 'Disabled (No Clan Yet)';
+                    apiToggle.className = 'text-gray-500';
+                }
+            }
+        }
+
+        async function refreshRoster() {
+            showToast('Refreshing roster...', 'info');
+            roster = await fetchClanMembers();
+            document.getElementById('roster-textarea').value = roster.join('\n');
+            updateRosterDisplay();
+        }
+
+        function enableManualRosterEdit() {
+            const textarea = document.getElementById('roster-textarea');
+            textarea.removeAttribute('readonly');
+            textarea.placeholder = 'Enter one RSN per line...';
+            showToast('Manual editing enabled - you can now modify the roster', 'info');
         }
 
         function saveRoster() {
@@ -523,60 +656,98 @@
                 return [];
             }
             
-            // Find adjacent slots
-            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
-            const slotIndex = sortedSlots.findIndex(s => s.id === slot.id);
-            const adjacentSlots = [];
+            // Enhanced "Hat Draw" Assignment System
+            const fairnessScores = calculateFairnessScores(available, counts, slot);
+            const assigned = performHatDraw(fairnessScores, 5);
             
-            if (slotIndex > 0 && isAdjacent(sortedSlots[slotIndex - 1], slot)) {
-                adjacentSlots.push(sortedSlots[slotIndex - 1]);
-            }
-            if (slotIndex < sortedSlots.length - 1 && isAdjacent(slot, sortedSlots[slotIndex + 1])) {
-                adjacentSlots.push(sortedSlots[slotIndex + 1]);
-            }
+            return assigned;
+        }
+
+        function calculateFairnessScores(available, counts, slot) {
+            const scores = [];
+            const maxAssignments = Math.max(...Object.values(counts));
+            const minAssignments = Math.min(...Object.values(counts));
             
-            const adjacentAssigned = new Set();
-            adjacentSlots.forEach(adjSlot => {
-                adjSlot.assigned.forEach(name => adjacentAssigned.add(name));
+            // Find adjacent slots for burnout prevention
+            const adjacentMembers = getAdjacentSlotMembers(slot);
+            
+            available.forEach(member => {
+                const assignmentCount = counts[member] || 0;
+                
+                // Base fairness score (lower assignments = higher score)
+                let fairnessScore = maxAssignments - assignmentCount + 1;
+                
+                // Bonus for members with fewer assignments
+                if (assignmentCount === minAssignments) {
+                    fairnessScore += 3;
+                }
+                
+                // Penalty for adjacent slot assignments (prevent burnout)
+                if (adjacentMembers.has(member)) {
+                    fairnessScore = Math.max(1, fairnessScore - 2);
+                }
+                
+                // Add slight randomness for true "hat draw" feel
+                const randomBonus = Math.random() * 0.5;
+                
+                scores.push({
+                    name: member,
+                    score: fairnessScore + randomBonus,
+                    assignments: assignmentCount
+                });
             });
             
-            // Prefer non-adjacent members
-            let candidates = available.filter(name => !adjacentAssigned.has(name));
-            if (candidates.length < 5) {
-                candidates = available; // Fallback to all available
-            }
+            return scores.sort((a, b) => b.score - a.score);
+        }
+
+        function getAdjacentSlotMembers(slot) {
+            const adjacentMembers = new Set();
+            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            const slotIndex = sortedSlots.findIndex(s => s.id === slot.id);
             
-            // Sort by assignment count
-            candidates.sort((a, b) => counts[a] - counts[b]);
-            
-            const assigned = [];
-            const needed = Math.min(5, candidates.length);
-            
-            // Group by count and pick randomly within each group
-            let currentCount = counts[candidates[0]] || 0;
-            let currentGroup = [];
-            
-            for (const candidate of candidates) {
-                if ((counts[candidate] || 0) === currentCount) {
-                    currentGroup.push(candidate);
-                } else {
-                    // Pick from current group
-                    while (currentGroup.length > 0 && assigned.length < needed) {
-                        const randomIndex = Math.floor(Math.random() * currentGroup.length);
-                        assigned.push(currentGroup.splice(randomIndex, 1)[0]);
-                    }
-                    
-                    if (assigned.length >= needed) break;
-                    
-                    currentCount = counts[candidate] || 0;
-                    currentGroup = [candidate];
+            // Check previous slot (within 4 hours)
+            if (slotIndex > 0) {
+                const prevSlot = sortedSlots[slotIndex - 1];
+                const timeDiff = (new Date(slot.startUtcISO) - new Date(prevSlot.endUtcISO)) / (1000 * 60 * 60);
+                if (timeDiff <= 4) {
+                    prevSlot.assigned.forEach(name => adjacentMembers.add(name));
                 }
             }
             
-            // Pick remaining from last group
-            while (currentGroup.length > 0 && assigned.length < needed) {
-                const randomIndex = Math.floor(Math.random() * currentGroup.length);
-                assigned.push(currentGroup.splice(randomIndex, 1)[0]);
+            // Check next slot (within 4 hours)
+            if (slotIndex < sortedSlots.length - 1) {
+                const nextSlot = sortedSlots[slotIndex + 1];
+                const timeDiff = (new Date(nextSlot.startUtcISO) - new Date(slot.endUtcISO)) / (1000 * 60 * 60);
+                if (timeDiff <= 4) {
+                    nextSlot.assigned.forEach(name => adjacentMembers.add(name));
+                }
+            }
+            
+            return adjacentMembers;
+        }
+
+        function performHatDraw(scores, needed) {
+            const assigned = [];
+            const remaining = [...scores];
+            
+            // Create weighted "hat" based on fairness scores
+            while (assigned.length < needed && remaining.length > 0) {
+                const totalWeight = remaining.reduce((sum, member) => sum + member.score, 0);
+                let random = Math.random() * totalWeight;
+                
+                for (let i = 0; i < remaining.length; i++) {
+                    random -= remaining[i].score;
+                    if (random <= 0) {
+                        assigned.push(remaining[i].name);
+                        remaining.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                // Fallback if rounding errors
+                if (assigned.length === 0 && remaining.length > 0) {
+                    assigned.push(remaining.shift().name);
+                }
             }
             
             return assigned;
@@ -814,7 +985,14 @@
             loadPledges();
             
             // Set up event listeners
-            document.getElementById('save-roster').addEventListener('click', saveRoster);
+            document.getElementById('refresh-roster').addEventListener('click', refreshRoster);
+            document.getElementById('save-roster').addEventListener('click', () => {
+                enableManualRosterEdit();
+                setTimeout(() => {
+                    document.getElementById('save-roster').onclick = saveRoster;
+                    document.getElementById('save-roster').innerHTML = '💾 Save Changes';
+                }, 100);
+            });
             document.getElementById('add-slot').addEventListener('click', addSlot);
             document.getElementById('assign-all').addEventListener('click', assignAllSlots);
             document.getElementById('export-csv').addEventListener('click', exportCSV);
