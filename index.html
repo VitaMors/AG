@@ -314,6 +314,9 @@
                     <button id="super-debug" class="mt-1 w-full bg-red-800 hover:bg-red-900 text-white py-1 px-4 rounded-lg text-xs font-semibold transition-colors" onclick="superDebug()">
                         🔥 SUPER DEBUG (Force Everything)
                     </button>
+                    <button id="force-update" class="mt-1 w-full bg-blue-800 hover:bg-blue-900 text-white py-1 px-4 rounded-lg text-xs font-semibold transition-colors" onclick="forceDisplayUpdate()">
+                        🔄 Force Display Update
+                    </button>
                 </div>
             </div>
 
@@ -722,6 +725,14 @@
             console.log(`Updating protection display at: ${now.toISOString()}`);
             console.log(`Current schedule has ${currentSchedule.length} shifts`);
             
+            // Force UTC clock update
+            const clockEl = document.getElementById('utc-clock');
+            if (clockEl) {
+                const utcTime = now.toUTCString().slice(17, 25);
+                const utcDate = now.toUTCString().slice(0, 16);
+                clockEl.textContent = `${utcTime} UTC | ${utcDate}`;
+            }
+            
             // Find current shifts for both worlds
             const currentShifts = {
                 3: getCurrentShift(3, now),
@@ -736,6 +747,12 @@
             
             // Update World 84 display  
             updateWorldDisplay(84, currentShifts[84]);
+            
+            // Update local time
+            const localTimeEl = document.getElementById('local-time');
+            if (localTimeEl) {
+                localTimeEl.textContent = now.toLocaleString();
+            }
         }
 
         function getCurrentShift(world, currentTime) {
@@ -1226,8 +1243,22 @@
             // Auto-generate schedule immediately with current roster
             setTimeout(() => {
                 console.log('🚀 Auto-generating schedule on page load...');
-                generateAutomaticSchedule(true); // Force generation
+                console.log('Roster at generation time:', roster);
+                if (roster.length > 0) {
+                    generateAutomaticSchedule(true); // Force generation
+                } else {
+                    console.log('❌ No roster available, retrying in 2 seconds...');
+                    setTimeout(() => {
+                        console.log('🔄 Retry auto-generation...');
+                        generateAutomaticSchedule(true);
+                    }, 2000);
+                }
             }, 1000);
+            
+            // Also set up regular updates every 30 seconds
+            setInterval(() => {
+                updateCurrentProtectionDisplay();
+            }, 30000);
             
             // Set up event listeners
             document.getElementById('refresh-roster').addEventListener('click', refreshRoster);
@@ -1302,6 +1333,21 @@
                 console.log('Initialization completed');
             }, 500);
         });
+
+        // Force Display Update function
+        window.forceDisplayUpdate = function() {
+            console.log('🔄 FORCE DISPLAY UPDATE');
+            console.log('Current schedule:', currentSchedule);
+            console.log('Roster:', roster);
+            
+            // Force clock update
+            updateClock();
+            
+            // Force protection display update
+            updateCurrentProtectionDisplay();
+            
+            console.log('✅ Display update forced');
+        };
 
         // Global debug function
         window.superDebug = function() {
