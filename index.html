@@ -690,11 +690,22 @@
         }
 
         function getCurrentShift(world, currentTime) {
-            return currentSchedule.find(shift => {
+            console.log(`Looking for current shift for World ${world} at ${currentTime.toISOString()}`);
+            
+            const currentShift = currentSchedule.find(shift => {
                 const start = new Date(shift.startUtcISO);
                 const end = new Date(shift.endUtcISO);
-                return shift.world === world && currentTime >= start && currentTime < end;
+                const isRightWorld = shift.world === world;
+                const isCurrentTime = currentTime >= start && currentTime < end;
+                
+                console.log(`Checking shift: World ${shift.world}, ${start.toISOString()} to ${end.toISOString()}`);
+                console.log(`  Right world: ${isRightWorld}, Right time: ${isCurrentTime}, Assigned: ${shift.assigned.length}`);
+                
+                return isRightWorld && isCurrentTime;
             });
+            
+            console.log(`Found current shift for World ${world}:`, currentShift);
+            return currentShift;
         }
 
         function updateWorldDisplay(world, currentShift) {
@@ -1079,18 +1090,13 @@
             
             showToast('🚨 EMERGENCY FIX: Creating immediate coverage...', 'info');
             
-            // Create simple current shift coverage
+            // Create simple current shift coverage that definitely includes NOW
             const now = new Date();
             console.log('Current time:', now.toISOString());
             
-            const currentHour = now.getUTCHours();
-            const shiftStart = Math.floor(currentHour / 4) * 4;
-            
-            const startTime = new Date(now);
-            startTime.setUTCHours(shiftStart, 0, 0, 0);
-            
-            const endTime = new Date(startTime);
-            endTime.setUTCHours(startTime.getUTCHours() + 4);
+            // Start 1 hour ago, end 3 hours from now to ensure we cover current time
+            const startTime = new Date(now.getTime() - (1 * 60 * 60 * 1000)); // 1 hour ago
+            const endTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));   // 3 hours from now
             
             console.log('Shift time:', startTime.toISOString(), 'to', endTime.toISOString());
             
