@@ -305,6 +305,9 @@
                             🎩 Regenerate Schedule
                         </button>
                     </div>
+                    <button id="debug-schedule" class="mt-2 w-full bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-red-500" aria-label="Debug schedule generation">
+                        🐛 Debug Schedule (Check Console)
+                    </button>
                 </div>
             </div>
 
@@ -576,8 +579,8 @@
                 }
             }
             
-            if (roster.length < SCHEDULE_CONFIG.guardiansPerShift * 2) {
-                showToast('Need more clan members for automatic scheduling', 'error');
+            if (roster.length < SCHEDULE_CONFIG.guardiansPerShift) {
+                showToast(`Need at least ${SCHEDULE_CONFIG.guardiansPerShift} clan members for automatic scheduling`, 'error');
                 return;
             }
             
@@ -586,6 +589,10 @@
             const schedule = [];
             const startTime = getNextShiftStart();
             const totalShifts = (SCHEDULE_CONFIG.daysAhead * 24) / SCHEDULE_CONFIG.shiftDurationHours;
+            
+            console.log(`Generating schedule starting from: ${startTime.toISOString()}`);
+            console.log(`Total shifts to generate: ${totalShifts}`);
+            console.log(`Roster size: ${roster.length}`);
             
             // Generate shifts for both worlds
             for (let shiftIndex = 0; shiftIndex < totalShifts; shiftIndex++) {
@@ -619,18 +626,14 @@
         function getNextShiftStart() {
             const now = new Date();
             const currentHour = now.getUTCHours();
-            const nextShiftHour = Math.ceil(currentHour / SCHEDULE_CONFIG.shiftDurationHours) * SCHEDULE_CONFIG.shiftDurationHours;
             
-            const nextShift = new Date(now);
-            nextShift.setUTCHours(nextShiftHour, 0, 0, 0);
+            // Always start from the current 4-hour block to ensure immediate coverage
+            const currentShiftStart = Math.floor(currentHour / SCHEDULE_CONFIG.shiftDurationHours) * SCHEDULE_CONFIG.shiftDurationHours;
             
-            // If we're already past that time today, start tomorrow
-            if (nextShift <= now) {
-                nextShift.setUTCDate(nextShift.getUTCDate() + 1);
-                nextShift.setUTCHours(0, 0, 0, 0);
-            }
+            const shiftStart = new Date(now);
+            shiftStart.setUTCHours(currentShiftStart, 0, 0, 0);
             
-            return nextShift;
+            return shiftStart;
         }
 
         // Assignment Logic
@@ -650,19 +653,27 @@
         }
 
         function assignAllShifts(schedule) {
-            schedule.forEach(shift => {
-                shift.assigned = assignShift(shift, schedule);
+            console.log(`Assigning guardians to ${schedule.length} shifts`);
+            schedule.forEach((shift, index) => {
+                const assigned = assignShift(shift, schedule);
+                shift.assigned = assigned;
+                console.log(`Shift ${index + 1} (World ${shift.world}): assigned ${assigned.length} guardians - ${assigned.join(', ')}`);
             });
         }
 
         function updateCurrentProtectionDisplay() {
             const now = new Date();
+            console.log(`Updating protection display at: ${now.toISOString()}`);
+            console.log(`Current schedule has ${currentSchedule.length} shifts`);
             
             // Find current shifts for both worlds
             const currentShifts = {
                 3: getCurrentShift(3, now),
                 84: getCurrentShift(84, now)
             };
+            
+            console.log(`Current shift World 3:`, currentShifts[3]);
+            console.log(`Current shift World 84:`, currentShifts[84]);
             
             // Update World 3 display
             updateWorldDisplay(3, currentShifts[3]);
@@ -1067,6 +1078,13 @@
                 }, 100);
             });
             document.getElementById('regenerate-schedule').addEventListener('click', () => {
+                generateAutomaticSchedule(true);
+            });
+            document.getElementById('debug-schedule').addEventListener('click', () => {
+                console.log('=== DEBUG SCHEDULE ===');
+                console.log('Current roster:', roster);
+                console.log('Current schedule:', currentSchedule);
+                console.log('Schedule config:', SCHEDULE_CONFIG);
                 generateAutomaticSchedule(true);
             });
             document.getElementById('export-csv').addEventListener('click', exportCSV);
