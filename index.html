@@ -221,11 +221,64 @@
                 </div>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
-                <!-- Roster Management -->
+            <!-- Current Protection Status -->
+            <div class="max-w-6xl mx-auto mb-12">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- World 3 Status -->
+                    <div class="bg-gray-800 rounded-2xl p-6 border-l-4 border-cyan-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xl font-semibold text-cyan-400">🌍 World 3 Protection</h4>
+                            <span id="w3-status" class="px-3 py-1 rounded-full text-sm bg-green-600 text-white">🛡️ ACTIVE</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Current Shift:</span>
+                                <span id="w3-shift-time" class="font-mono text-cyan-400">14:00 - 18:00 UTC</span>
+                            </div>
+                            <div class="space-y-2">
+                                <span class="text-gray-300 text-sm">On Duty:</span>
+                                <div id="w3-guardians" class="flex flex-wrap gap-2">
+                                    <!-- Will be populated by JS -->
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-400">Next Shift:</span>
+                                <span id="w3-next-shift" class="text-gray-400">18:00 UTC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- World 84 Status -->
+                    <div class="bg-gray-800 rounded-2xl p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xl font-semibold text-purple-400">🌍 World 84 Protection</h4>
+                            <span id="w84-status" class="px-3 py-1 rounded-full text-sm bg-green-600 text-white">🛡️ ACTIVE</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Current Shift:</span>
+                                <span id="w84-shift-time" class="font-mono text-purple-400">14:00 - 18:00 UTC</span>
+                            </div>
+                            <div class="space-y-2">
+                                <span class="text-gray-300 text-sm">On Duty:</span>
+                                <div id="w84-guardians" class="flex flex-wrap gap-2">
+                                    <!-- Will be populated by JS -->
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-400">Next Shift:</span>
+                                <span id="w84-next-shift" class="text-gray-400">18:00 UTC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roster Management -->
+            <div class="max-w-4xl mx-auto mb-12">
                 <div class="bg-gray-800 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-xl font-semibold text-cyan-400">Roster Management</h4>
+                        <h4 class="text-xl font-semibold text-cyan-400">Guardian Roster</h4>
                         <div class="flex items-center space-x-2">
                             <span id="api-status" class="px-2 py-1 rounded-full text-xs bg-orange-600 text-white">Placeholder Mode</span>
                             <span id="roster-count-badge" class="px-2 py-1 rounded-full text-xs bg-purple-600 text-white">15 Members</span>
@@ -238,67 +291,31 @@
                             <span id="api-toggle" class="text-gray-500">Disabled (No Clan Yet)</span>
                         </div>
                         <div class="text-xs text-gray-500 mt-1">
-                            Will auto-sync when clan is created
+                            Schedule auto-generates from this roster every 4 hours
                         </div>
                     </div>
                     
-                    <textarea id="roster-textarea" rows="8" placeholder="Clan members will appear here..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent" readonly></textarea>
+                    <textarea id="roster-textarea" rows="6" placeholder="Clan members will appear here..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent" readonly></textarea>
                     
                     <div class="mt-4 flex space-x-2">
                         <button id="refresh-roster" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-blue-500" aria-label="Refresh clan member list">
-                            🔄 Refresh List
+                            🔄 Refresh Roster
                         </button>
-                        <button id="save-roster" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-cyan-500" aria-label="Save manual roster changes">
-                            💾 Save Manual
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Slot Builder -->
-                <div class="bg-gray-800 rounded-2xl p-6">
-                    <h4 class="text-xl font-semibold mb-4 text-purple-400">Slot Builder</h4>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="start-time" class="block text-sm font-medium text-gray-300 mb-2">Start Time (UTC)</label>
-                            <input type="datetime-local" id="start-time" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        </div>
-                        
-                        <div>
-                            <label for="end-time" class="block text-sm font-medium text-gray-300 mb-2">End Time (UTC)</label>
-                            <input type="datetime-local" id="end-time" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        </div>
-                        
-                        <div>
-                            <label for="world-select" class="block text-sm font-medium text-gray-300 mb-2">World</label>
-                            <select id="world-select" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                <option value="3">World 3</option>
-                                <option value="84">World 84</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="required-guardians" class="block text-sm font-medium text-gray-300 mb-2">Required Guardians</label>
-                            <input type="number" id="required-guardians" value="5" readonly class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-gray-400 cursor-not-allowed">
-                        </div>
-                        
-                        <button id="add-slot" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-purple-500" aria-label="Add new patrol slot">
-                            Add Slot
+                        <button id="regenerate-schedule" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-green-500" aria-label="Regenerate protection schedule">
+                            🎩 Regenerate Schedule
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Assignment Controls -->
+            <!-- Schedule Controls -->
             <div class="max-w-6xl mx-auto mb-8">
                 <div class="flex flex-wrap gap-4 justify-center">
-                    <button id="assign-all" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-green-500" aria-label="Assign guardians to all unassigned slots">
-                        Assign All Unassigned Slots
-                    </button>
                     <button id="export-csv" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-blue-500" aria-label="Export schedule as CSV">
-                        Export CSV
+                        📊 Export Schedule
                     </button>
-                    <button id="clear-schedule" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-red-500" aria-label="Clear entire schedule">
-                        Clear Schedule
+                    <button id="view-upcoming" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-purple-500" aria-label="View upcoming shifts">
+                        📅 View Upcoming
                     </button>
                 </div>
             </div>
@@ -308,26 +325,7 @@
                 <p class="text-gray-400">All times are UTC. Your local time is: <span id="local-time" class="font-mono text-cyan-400"></span></p>
             </div>
 
-            <!-- Schedule Table -->
-            <div class="bg-gray-800 rounded-2xl p-6 overflow-x-auto">
-                <h4 class="text-xl font-semibold mb-4 text-cyan-400">Patrol Schedule</h4>
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-700">
-                            <th class="text-left py-3 px-2 text-gray-300">Start (UTC)</th>
-                            <th class="text-left py-3 px-2 text-gray-300">End (UTC)</th>
-                            <th class="text-center py-3 px-2 text-gray-300">World</th>
-                            <th class="text-left py-3 px-2 text-gray-300">Assigned Guardians</th>
-                            <th class="text-center py-3 px-2 text-gray-300">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="schedule-table" class="text-gray-300">
-                        <tr>
-                            <td colspan="5" class="text-center py-8 text-gray-500">No patrol slots scheduled</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+
         </div>
     </section>
 
@@ -355,10 +353,10 @@
         
         const LS_KEYS = {
             roster: 'abyss_roster',
-            slots: 'abyss_slots',
-            assignments: 'abyss_assignments',
+            schedule: 'abyss_schedule',
             pledges: 'abyss_pledges',
-            lastApiUpdate: 'abyss_last_api_update'
+            lastApiUpdate: 'abyss_last_api_update',
+            lastScheduleGeneration: 'abyss_last_schedule_gen'
         };
 
         // RuneScape API Configuration (for future use)
@@ -368,9 +366,18 @@
             enabled: false // Set to true when clan is created
         };
 
+        // Schedule Configuration
+        const SCHEDULE_CONFIG = {
+            shiftDurationHours: 4,
+            guardiansPerShift: 3,
+            worlds: [3, 84],
+            regenerateIntervalHours: 4,
+            daysAhead: 7
+        };
+
         // State
         let roster = [];
-        let slots = [];
+        let currentSchedule = [];
         let pledges = [];
 
         // Utility Functions
@@ -554,84 +561,85 @@
             showToast(`Roster saved with ${roster.length} members`, 'success');
         }
 
-        // Slot Management
-        function loadSlots() {
-            slots = loadFromStorage(LS_KEYS.slots, []);
-            if (slots.length === 0) {
-                // Add default slots
-                const now = new Date();
-                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                
-                slots.push({
-                    id: generateId(),
-                    startUtcISO: new Date(today.getTime() + 14 * 60 * 60 * 1000).toISOString(),
-                    endUtcISO: new Date(today.getTime() + 16 * 60 * 60 * 1000).toISOString(),
-                    world: 3,
-                    assigned: []
-                });
-                
-                slots.push({
-                    id: generateId(),
-                    startUtcISO: new Date(today.getTime() + 18 * 60 * 60 * 1000).toISOString(),
-                    endUtcISO: new Date(today.getTime() + 20 * 60 * 60 * 1000).toISOString(),
-                    world: 84,
-                    assigned: []
-                });
-                
-                saveToStorage(LS_KEYS.slots, slots);
+        // Automatic Schedule Generation
+        function generateAutomaticSchedule(forceRegenerate = false) {
+            const lastGeneration = loadFromStorage(LS_KEYS.lastScheduleGeneration, 0);
+            const now = Date.now();
+            const regenerateInterval = SCHEDULE_CONFIG.regenerateIntervalHours * 60 * 60 * 1000;
+            
+            // Check if we need to regenerate
+            if (!forceRegenerate && (now - lastGeneration) < regenerateInterval) {
+                currentSchedule = loadFromStorage(LS_KEYS.schedule, []);
+                if (currentSchedule.length > 0) {
+                    updateCurrentProtectionDisplay();
+                    return;
+                }
             }
-            renderScheduleTable();
+            
+            if (roster.length < SCHEDULE_CONFIG.guardiansPerShift * 2) {
+                showToast('Need more clan members for automatic scheduling', 'error');
+                return;
+            }
+            
+            showToast('Generating protection schedule...', 'info');
+            
+            const schedule = [];
+            const startTime = getNextShiftStart();
+            const totalShifts = (SCHEDULE_CONFIG.daysAhead * 24) / SCHEDULE_CONFIG.shiftDurationHours;
+            
+            // Generate shifts for both worlds
+            for (let shiftIndex = 0; shiftIndex < totalShifts; shiftIndex++) {
+                const shiftStart = new Date(startTime.getTime() + (shiftIndex * SCHEDULE_CONFIG.shiftDurationHours * 60 * 60 * 1000));
+                const shiftEnd = new Date(shiftStart.getTime() + (SCHEDULE_CONFIG.shiftDurationHours * 60 * 60 * 1000));
+                
+                SCHEDULE_CONFIG.worlds.forEach(world => {
+                    const shift = {
+                        id: generateId(),
+                        startUtcISO: shiftStart.toISOString(),
+                        endUtcISO: shiftEnd.toISOString(),
+                        world: world,
+                        assigned: []
+                    };
+                    
+                    schedule.push(shift);
+                });
+            }
+            
+            // Assign guardians to all shifts
+            assignAllShifts(schedule);
+            
+            currentSchedule = schedule;
+            saveToStorage(LS_KEYS.schedule, currentSchedule);
+            saveToStorage(LS_KEYS.lastScheduleGeneration, now);
+            
+            updateCurrentProtectionDisplay();
+            showToast(`Generated ${totalShifts} shifts for ${SCHEDULE_CONFIG.daysAhead} days`, 'success');
         }
-
-        function addSlot() {
-            const startTime = document.getElementById('start-time').value;
-            const endTime = document.getElementById('end-time').value;
-            const world = parseInt(document.getElementById('world-select').value);
+        
+        function getNextShiftStart() {
+            const now = new Date();
+            const currentHour = now.getUTCHours();
+            const nextShiftHour = Math.ceil(currentHour / SCHEDULE_CONFIG.shiftDurationHours) * SCHEDULE_CONFIG.shiftDurationHours;
             
-            if (!startTime || !endTime) {
-                showToast('Please fill in both start and end times', 'error');
-                return;
+            const nextShift = new Date(now);
+            nextShift.setUTCHours(nextShiftHour, 0, 0, 0);
+            
+            // If we're already past that time today, start tomorrow
+            if (nextShift <= now) {
+                nextShift.setUTCDate(nextShift.getUTCDate() + 1);
+                nextShift.setUTCHours(0, 0, 0, 0);
             }
             
-            const startDate = new Date(startTime);
-            const endDate = new Date(endTime);
-            
-            if (startDate >= endDate) {
-                showToast('Start time must be before end time', 'error');
-                return;
-            }
-            
-            if (![3, 84].includes(world)) {
-                showToast('World must be 3 or 84', 'error');
-                return;
-            }
-            
-            const slot = {
-                id: generateId(),
-                startUtcISO: startDate.toISOString(),
-                endUtcISO: endDate.toISOString(),
-                world: world,
-                assigned: []
-            };
-            
-            slots.push(slot);
-            saveToStorage(LS_KEYS.slots, slots);
-            renderScheduleTable();
-            
-            // Clear form
-            document.getElementById('start-time').value = '';
-            document.getElementById('end-time').value = '';
-            
-            showToast('Patrol slot added successfully', 'success');
+            return nextShift;
         }
 
         // Assignment Logic
-        function getAssignmentCounts() {
+        function getAssignmentCounts(schedule = currentSchedule) {
             const counts = {};
             roster.forEach(name => counts[name] = 0);
             
-            slots.forEach(slot => {
-                slot.assigned.forEach(name => {
+            schedule.forEach(shift => {
+                shift.assigned.forEach(name => {
                     if (counts[name] !== undefined) {
                         counts[name]++;
                     }
@@ -641,6 +649,95 @@
             return counts;
         }
 
+        function assignAllShifts(schedule) {
+            schedule.forEach(shift => {
+                shift.assigned = assignShift(shift, schedule);
+            });
+        }
+
+        function updateCurrentProtectionDisplay() {
+            const now = new Date();
+            
+            // Find current shifts for both worlds
+            const currentShifts = {
+                3: getCurrentShift(3, now),
+                84: getCurrentShift(84, now)
+            };
+            
+            // Update World 3 display
+            updateWorldDisplay(3, currentShifts[3]);
+            
+            // Update World 84 display  
+            updateWorldDisplay(84, currentShifts[84]);
+        }
+
+        function getCurrentShift(world, currentTime) {
+            return currentSchedule.find(shift => {
+                const start = new Date(shift.startUtcISO);
+                const end = new Date(shift.endUtcISO);
+                return shift.world === world && currentTime >= start && currentTime < end;
+            });
+        }
+
+        function updateWorldDisplay(world, currentShift) {
+            const prefix = world === 3 ? 'w3' : 'w84';
+            const color = world === 3 ? 'cyan' : 'purple';
+            
+            const statusEl = document.getElementById(`${prefix}-status`);
+            const shiftTimeEl = document.getElementById(`${prefix}-shift-time`);
+            const guardiansEl = document.getElementById(`${prefix}-guardians`);
+            const nextShiftEl = document.getElementById(`${prefix}-next-shift`);
+            
+            if (currentShift) {
+                // Active protection
+                statusEl.innerHTML = '🛡️ ACTIVE';
+                statusEl.className = 'px-3 py-1 rounded-full text-sm bg-green-600 text-white';
+                
+                const start = formatTime(currentShift.startUtcISO);
+                const end = formatTime(currentShift.endUtcISO);
+                shiftTimeEl.textContent = `${start} - ${end} UTC`;
+                
+                // Display assigned guardians
+                guardiansEl.innerHTML = currentShift.assigned.map(name => 
+                    `<span class="bg-gray-700 text-${color}-400 px-2 py-1 rounded-full text-xs">🗡️ ${name}</span>`
+                ).join('');
+                
+                // Find next shift
+                const nextShift = getNextShift(world, new Date(currentShift.endUtcISO));
+                if (nextShift) {
+                    nextShiftEl.textContent = formatTime(nextShift.startUtcISO) + ' UTC';
+                }
+            } else {
+                // No active protection
+                statusEl.innerHTML = '⚠️ OFFLINE';
+                statusEl.className = 'px-3 py-1 rounded-full text-sm bg-red-600 text-white';
+                shiftTimeEl.textContent = 'No active shift';
+                guardiansEl.innerHTML = '<span class="text-gray-500 text-sm">No guardians assigned</span>';
+                
+                const nextShift = getNextShift(world, new Date());
+                if (nextShift) {
+                    nextShiftEl.textContent = formatTime(nextShift.startUtcISO) + ' UTC';
+                } else {
+                    nextShiftEl.textContent = 'Schedule needed';
+                }
+            }
+        }
+
+        function getNextShift(world, afterTime) {
+            return currentSchedule
+                .filter(shift => shift.world === world && new Date(shift.startUtcISO) > afterTime)
+                .sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO))[0];
+        }
+
+        function formatTime(isoString) {
+            return new Date(isoString).toLocaleString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'UTC',
+                hour12: false
+            });
+        }
+
         function isAdjacent(slot1, slot2) {
             const slot1End = new Date(slot1.endUtcISO);
             const slot2Start = new Date(slot2.startUtcISO);
@@ -648,28 +745,28 @@
             return timeDiff <= 2;
         }
 
-        function assignSlot(slot) {
-            const counts = getAssignmentCounts();
-            const available = roster.filter(name => !slot.assigned.includes(name));
+        function assignShift(shift, schedule = currentSchedule) {
+            const counts = getAssignmentCounts(schedule);
+            const available = roster.filter(name => !shift.assigned.includes(name));
             
             if (available.length === 0) {
                 return [];
             }
             
             // Enhanced "Hat Draw" Assignment System
-            const fairnessScores = calculateFairnessScores(available, counts, slot);
-            const assigned = performHatDraw(fairnessScores, 5);
+            const fairnessScores = calculateFairnessScores(available, counts, shift, schedule);
+            const assigned = performHatDraw(fairnessScores, SCHEDULE_CONFIG.guardiansPerShift);
             
             return assigned;
         }
 
-        function calculateFairnessScores(available, counts, slot) {
+        function calculateFairnessScores(available, counts, shift, schedule) {
             const scores = [];
             const maxAssignments = Math.max(...Object.values(counts));
             const minAssignments = Math.min(...Object.values(counts));
             
             // Find adjacent slots for burnout prevention
-            const adjacentMembers = getAdjacentSlotMembers(slot);
+            const adjacentMembers = getAdjacentSlotMembers(shift, schedule);
             
             available.forEach(member => {
                 const assignmentCount = counts[member] || 0;
@@ -700,26 +797,26 @@
             return scores.sort((a, b) => b.score - a.score);
         }
 
-        function getAdjacentSlotMembers(slot) {
+        function getAdjacentSlotMembers(shift, schedule) {
             const adjacentMembers = new Set();
-            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
-            const slotIndex = sortedSlots.findIndex(s => s.id === slot.id);
+            const sortedShifts = [...schedule].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            const shiftIndex = sortedShifts.findIndex(s => s.id === shift.id);
             
-            // Check previous slot (within 4 hours)
-            if (slotIndex > 0) {
-                const prevSlot = sortedSlots[slotIndex - 1];
-                const timeDiff = (new Date(slot.startUtcISO) - new Date(prevSlot.endUtcISO)) / (1000 * 60 * 60);
+            // Check previous shift (within 4 hours)
+            if (shiftIndex > 0) {
+                const prevShift = sortedShifts[shiftIndex - 1];
+                const timeDiff = (new Date(shift.startUtcISO) - new Date(prevShift.endUtcISO)) / (1000 * 60 * 60);
                 if (timeDiff <= 4) {
-                    prevSlot.assigned.forEach(name => adjacentMembers.add(name));
+                    prevShift.assigned.forEach(name => adjacentMembers.add(name));
                 }
             }
             
-            // Check next slot (within 4 hours)
-            if (slotIndex < sortedSlots.length - 1) {
-                const nextSlot = sortedSlots[slotIndex + 1];
-                const timeDiff = (new Date(nextSlot.startUtcISO) - new Date(slot.endUtcISO)) / (1000 * 60 * 60);
+            // Check next shift (within 4 hours)
+            if (shiftIndex < sortedShifts.length - 1) {
+                const nextShift = sortedShifts[shiftIndex + 1];
+                const timeDiff = (new Date(nextShift.startUtcISO) - new Date(shift.endUtcISO)) / (1000 * 60 * 60);
                 if (timeDiff <= 4) {
-                    nextSlot.assigned.forEach(name => adjacentMembers.add(name));
+                    nextShift.assigned.forEach(name => adjacentMembers.add(name));
                 }
             }
             
@@ -803,26 +900,24 @@
         }
 
         function exportCSV() {
-            if (slots.length === 0) {
-                showToast('No slots to export', 'error');
+            if (currentSchedule.length === 0) {
+                showToast('No schedule to export', 'error');
                 return;
             }
             
-            const headers = ['Start (UTC)', 'End (UTC)', 'World', 'Guardian 1', 'Guardian 2', 'Guardian 3', 'Guardian 4', 'Guardian 5'];
+            const headers = ['Start (UTC)', 'End (UTC)', 'World', 'Guardian 1', 'Guardian 2', 'Guardian 3'];
             const rows = [headers];
             
-            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
+            const sortedShifts = [...currentSchedule].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
             
-            sortedSlots.forEach(slot => {
+            sortedShifts.forEach(shift => {
                 const row = [
-                    formatDateTime(slot.startUtcISO),
-                    formatDateTime(slot.endUtcISO),
-                    slot.world.toString(),
-                    slot.assigned[0] || '',
-                    slot.assigned[1] || '',
-                    slot.assigned[2] || '',
-                    slot.assigned[3] || '',
-                    slot.assigned[4] || ''
+                    formatDateTime(shift.startUtcISO),
+                    formatDateTime(shift.endUtcISO),
+                    shift.world.toString(),
+                    shift.assigned[0] || '',
+                    shift.assigned[1] || '',
+                    shift.assigned[2] || ''
                 ];
                 rows.push(row);
             });
@@ -842,56 +937,7 @@
             showToast('Schedule exported', 'success');
         }
 
-        function renderScheduleTable() {
-            const tbody = document.getElementById('schedule-table');
-            
-            if (slots.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No patrol slots scheduled</td></tr>';
-                return;
-            }
-            
-            const sortedSlots = [...slots].sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO));
-            
-            tbody.innerHTML = sortedSlots.map(slot => {
-                const worldColor = slot.world === 3 ? 'bg-cyan-600' : 'bg-purple-600';
-                const isUnderstaffed = slot.assigned.length < 5;
-                
-                return `
-                    <tr class="border-b border-gray-700">
-                        <td class="py-3 px-2 font-mono">${formatDateTime(slot.startUtcISO)}</td>
-                        <td class="py-3 px-2 font-mono">${formatDateTime(slot.endUtcISO)}</td>
-                        <td class="py-3 px-2 text-center">
-                            <span class="${worldColor} text-white px-2 py-1 rounded text-xs font-semibold">
-                                ${slot.world}
-                            </span>
-                        </td>
-                        <td class="py-3 px-2">
-                            <div class="flex flex-wrap gap-1">
-                                ${slot.assigned.map(name => 
-                                    `<span class="bg-gray-700 text-cyan-400 px-2 py-1 rounded-full text-xs">
-                                        🗡️ ${name}
-                                    </span>`
-                                ).join('')}
-                                ${isUnderstaffed ? 
-                                    `<span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs">
-                                        UNDER-STAFFED
-                                    </span>` : ''
-                                }
-                            </div>
-                        </td>
-                        <td class="py-3 px-2 text-center">
-                            <button 
-                                onclick="rerollSlot('${slot.id}')" 
-                                class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-xs transition-colors"
-                                aria-label="Re-roll assignments for this slot"
-                            >
-                                Re-roll
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+        // Note: renderScheduleTable removed - using live protection display instead
 
         // GP Pledges
         function loadPledges() {
@@ -972,17 +1018,44 @@
             });
         }
 
+        function showUpcomingShifts() {
+            const upcomingShifts = currentSchedule
+                .filter(shift => new Date(shift.startUtcISO) > new Date())
+                .sort((a, b) => new Date(a.startUtcISO) - new Date(b.startUtcISO))
+                .slice(0, 20); // Show next 20 shifts
+                
+            if (upcomingShifts.length === 0) {
+                showToast('No upcoming shifts scheduled', 'info');
+                return;
+            }
+            
+            // Create a simple display for upcoming shifts
+            let content = 'Upcoming Protection Shifts:\n\n';
+            upcomingShifts.forEach(shift => {
+                const start = new Date(shift.startUtcISO).toLocaleString('en-US', { timeZone: 'UTC' });
+                const world = shift.world;
+                const guardians = shift.assigned.join(', ') || 'Unassigned';
+                content += `${start} UTC - World ${world}: ${guardians}\n`;
+            });
+            
+            // For now, just show in console (can be enhanced with modal later)
+            console.log(content);
+            showToast('Upcoming shifts logged to console (F12)', 'info');
+        }
+
         // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Set up donation button links
             document.getElementById('paypal-btn').href = PAYPAL_LINK;
             document.getElementById('bmac-btn').href = BMAC_LINK;
             document.getElementById('treasurer-rsn').textContent = CLAN_TREASURER_RSN;
             
             // Load data
-            loadRoster();
-            loadSlots();
+            await loadRoster();
             loadPledges();
+            
+            // Generate initial schedule
+            generateAutomaticSchedule();
             
             // Set up event listeners
             document.getElementById('refresh-roster').addEventListener('click', refreshRoster);
@@ -993,12 +1066,19 @@
                     document.getElementById('save-roster').innerHTML = '💾 Save Changes';
                 }, 100);
             });
-            document.getElementById('add-slot').addEventListener('click', addSlot);
-            document.getElementById('assign-all').addEventListener('click', assignAllSlots);
+            document.getElementById('regenerate-schedule').addEventListener('click', () => {
+                generateAutomaticSchedule(true);
+            });
             document.getElementById('export-csv').addEventListener('click', exportCSV);
-            document.getElementById('clear-schedule').addEventListener('click', clearSchedule);
+            document.getElementById('view-upcoming').addEventListener('click', showUpcomingShifts);
             document.getElementById('copy-treasurer').addEventListener('click', copyTreasurerRSN);
             document.getElementById('clear-pledges').addEventListener('click', clearPledges);
+            
+            // Update display every minute
+            setInterval(() => {
+                updateCurrentProtectionDisplay();
+                generateAutomaticSchedule(); // Check if regeneration needed
+            }, 60000);
             
             // GP Pledge form
             document.getElementById('gp-pledge-form').addEventListener('submit', function(e) {
