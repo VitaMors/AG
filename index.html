@@ -432,12 +432,17 @@
             const clockEl = document.getElementById('utc-clock');
             if (clockEl) {
                 clockEl.textContent = `${utcTime} UTC | ${utcDate}`;
+                console.log('🕒 Clock updated:', `${utcTime} UTC | ${utcDate}`);
+            } else {
+                console.warn('⚠️ UTC clock element not found!');
             }
             
             // Update local time display
             const localTimeEl = document.getElementById('local-time');
             if (localTimeEl) {
                 localTimeEl.textContent = now.toLocaleString();
+            } else {
+                console.warn('⚠️ Local time element not found!');
             }
         }
 
@@ -1257,6 +1262,7 @@
             
             // Also set up regular updates every 30 seconds
             setInterval(() => {
+                updateClock(); // Ensure clock stays updated
                 updateCurrentProtectionDisplay();
             }, 30000);
             
@@ -1315,8 +1321,13 @@
                 document.getElementById('schedule-tip').style.display = 'none';
             });
             
-            // Start clock immediately and then every second
+            // Start clock immediately and aggressively
             updateClock();
+            setTimeout(updateClock, 100); // Quick update
+            setTimeout(updateClock, 500); // Another update
+            setTimeout(updateClock, 1000); // Final update
+            
+            // Update clock every second
             setInterval(updateClock, 1000);
             
             // Force initial display update
