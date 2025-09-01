@@ -422,7 +422,11 @@
             const now = new Date();
             const utcTime = now.toUTCString().slice(17, 25);
             const utcDate = now.toUTCString().slice(0, 16);
-            document.getElementById('utc-clock').textContent = `${utcTime} UTC | ${utcDate}`;
+            
+            const clockEl = document.getElementById('utc-clock');
+            if (clockEl) {
+                clockEl.textContent = `${utcTime} UTC | ${utcDate}`;
+            }
             
             // Update local time display
             const localTimeEl = document.getElementById('local-time');
@@ -1059,16 +1063,26 @@
         }
 
         function emergencyFix() {
-            console.log('=== EMERGENCY FIX ===');
-            showToast('Emergency fix: Creating immediate coverage...', 'info');
+            console.log('=== EMERGENCY FIX STARTED ===');
+            console.log('Current roster:', roster);
             
-            if (roster.length < 3) {
-                showToast('Need at least 3 guardians for emergency fix', 'error');
+            if (roster.length === 0) {
+                showToast('ERROR: Roster is empty! Try refreshing roster first.', 'error');
+                console.log('ERROR: No roster available');
                 return;
             }
             
+            if (roster.length < 3) {
+                showToast(`ERROR: Need at least 3 guardians, only have ${roster.length}`, 'error');
+                return;
+            }
+            
+            showToast('🚨 EMERGENCY FIX: Creating immediate coverage...', 'info');
+            
             // Create simple current shift coverage
             const now = new Date();
+            console.log('Current time:', now.toISOString());
+            
             const currentHour = now.getUTCHours();
             const shiftStart = Math.floor(currentHour / 4) * 4;
             
@@ -1078,35 +1092,48 @@
             const endTime = new Date(startTime);
             endTime.setUTCHours(startTime.getUTCHours() + 4);
             
+            console.log('Shift time:', startTime.toISOString(), 'to', endTime.toISOString());
+            
             // Create emergency schedule
             currentSchedule = [];
             
             // World 3 shift
+            const w3Guardians = roster.slice(0, Math.min(3, roster.length));
             const w3Shift = {
-                id: 'emergency-w3',
+                id: 'emergency-w3-' + Date.now(),
                 startUtcISO: startTime.toISOString(),
                 endUtcISO: endTime.toISOString(),
                 world: 3,
-                assigned: roster.slice(0, 3) // First 3 guardians
+                assigned: w3Guardians
             };
             
             // World 84 shift  
+            const w84Guardians = roster.length >= 6 ? roster.slice(3, 6) : roster.slice(0, Math.min(3, roster.length));
             const w84Shift = {
-                id: 'emergency-w84',
+                id: 'emergency-w84-' + Date.now(),
                 startUtcISO: startTime.toISOString(),
                 endUtcISO: endTime.toISOString(),
                 world: 84,
-                assigned: roster.slice(3, 6) // Next 3 guardians
+                assigned: w84Guardians
             };
             
             currentSchedule.push(w3Shift, w84Shift);
             
-            console.log('Emergency schedule created:', currentSchedule);
+            console.log('Emergency schedule created:');
+            console.log('World 3:', w3Shift);
+            console.log('World 84:', w84Shift);
             
+            // Force save and update
             saveToStorage(LS_KEYS.schedule, currentSchedule);
-            updateCurrentProtectionDisplay();
+            saveToStorage(LS_KEYS.lastScheduleGeneration, Date.now());
             
-            showToast('Emergency coverage activated! Both worlds are now protected.', 'success');
+            // Force display update
+            setTimeout(() => {
+                updateCurrentProtectionDisplay();
+                showToast(`✅ EMERGENCY COVERAGE ACTIVE! W3: ${w3Guardians.join(', ')} | W84: ${w84Guardians.join(', ')}`, 'success');
+            }, 100);
+            
+            console.log('=== EMERGENCY FIX COMPLETED ===');
         }
 
         function showUpcomingShifts() {
@@ -1203,9 +1230,23 @@
                 document.getElementById('schedule-tip').style.display = 'none';
             });
             
-            // Start clock
+            // Start clock immediately and then every second
             updateClock();
             setInterval(updateClock, 1000);
+            
+            // Force initial display update
+            setTimeout(() => {
+                console.log('=== INITIALIZATION CHECK ===');
+                console.log('UTC clock element exists:', !!document.getElementById('utc-clock'));
+                console.log('W3 status element exists:', !!document.getElementById('w3-status'));
+                console.log('W84 status element exists:', !!document.getElementById('w84-status'));
+                console.log('Emergency button exists:', !!document.getElementById('emergency-fix'));
+                
+                updateClock();
+                updateCurrentProtectionDisplay();
+                
+                console.log('Initialization completed');
+            }, 500);
         });
 
         // Make rerollSlot available globally for onclick handlers
